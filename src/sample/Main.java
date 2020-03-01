@@ -25,6 +25,7 @@ import java.util.List;
 public class Main extends Application {
     private Word word = new Word();
     private InstantSearch<String> instantSearch = new InstantSearch<>(word.words, String::contains);
+    MyRect open = null;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -121,9 +122,9 @@ public class Main extends Application {
                     Platform.runLater(primaryStage::hide);
                 }
 
-                // TODO
                 Platform.runLater(() -> {
-                    MyRect open = new MyRect();
+                    if (open != null) return;
+                    open = new MyRect();
                     open.start(new Stage());
                 });
             }

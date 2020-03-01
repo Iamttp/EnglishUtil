@@ -90,6 +90,7 @@ public class MyRect extends Application {
                 stage.close();// 关闭当前窗口
                 double w = sceneX_end - sceneX_start;
                 double h = sceneY_end - sceneY_start;
+                if (w < 0 || h < 0) return;
                 /*截图*/
                 Robot robot = null;
                 try {
@@ -129,9 +130,5 @@ public class MyRect extends Application {
                 primaryStage.close();
             }
         });
-    }
-
-    public static void main(String[] args) {
-        launch(args);
     }
 }
