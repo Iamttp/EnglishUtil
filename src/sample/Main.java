@@ -1,6 +1,5 @@
 package sample;
 
-import com.melloware.jintellitype.HotkeyListener;
 import com.melloware.jintellitype.JIntellitype;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -30,8 +29,7 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-        Application.setUserAgentStylesheet(getClass().getResource("sample.css")
-                .toExternalForm());
+        Application.setUserAgentStylesheet(getClass().getResource("sample.css").toExternalForm());
 
         TextField Input = (TextField) root.lookup("#Input");
         ListView<String> listview = (ListView<String>) root.lookup("#listView");
@@ -106,7 +104,9 @@ public class Main extends Application {
         trayIcon.addMouseListener(mouseListener);
 
         int GLOBAL_HOT_KEY_1 = 0;
+        int GLOBAL_HOT_KEY_2 = 1;
         JIntellitype.getInstance().registerHotKey(GLOBAL_HOT_KEY_1, JIntellitype.MOD_SHIFT, (int) 'Q');
+        JIntellitype.getInstance().registerHotKey(GLOBAL_HOT_KEY_2, JIntellitype.MOD_SHIFT, (int) 'A');
         JIntellitype.getInstance().addHotKeyListener(markCode -> {
             if (markCode == GLOBAL_HOT_KEY_1) {
                 Platform.setImplicitExit(false); //多次使用显示和隐藏设置false
@@ -115,6 +115,17 @@ public class Main extends Application {
                 } else {
                     Platform.runLater(primaryStage::show);
                 }
+            } else if (markCode == GLOBAL_HOT_KEY_2) {
+                Platform.setImplicitExit(false); //多次使用显示和隐藏设置false
+                if (primaryStage.isShowing()) {
+                    Platform.runLater(primaryStage::hide);
+                }
+
+                // TODO
+                Platform.runLater(() -> {
+                    MyRect open = new MyRect();
+                    open.start(new Stage());
+                });
             }
         });
     }
