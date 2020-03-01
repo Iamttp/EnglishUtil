@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.control.ComboBox?>
+
+<BorderPane fx:id="Panel" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="357.0" prefWidth="608.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+    <center>
+        <TextField fx:id="Input" prefHeight="78.0" prefWidth="446.0" style="-fx-font-size: 30;" BorderPane.alignment="CENTER" />
+    </center>
+    <bottom>
+        <ListView fx:id="listView" prefHeight="267.0" prefWidth="608.0" style="-fx-font-size: 30;" styleClass="-fx-pref-width: 0;" BorderPane.alignment="CENTER" />
+    </bottom>
+</BorderPane>
