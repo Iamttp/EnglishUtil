@@ -36,9 +36,9 @@ public class Main extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
 
         primaryStage.setTitle("Demo");
-Scene scene = new Scene(root);
-scene.getStylesheets().add(getClass().getResource("sample.css").toExternalForm());
-primaryStage.setScene(scene);
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add(getClass().getResource("sample.css").toExternalForm());
+        primaryStage.setScene(scene);
         primaryStage.setHeight(80);
         primaryStage.setResizable(false);//窗口不可改变高度 宽度 这样就不用调节自适应了
         primaryStage.setOpacity(0.8);//设置透明度 0为完全透明 1为完全不透明 默认是1
