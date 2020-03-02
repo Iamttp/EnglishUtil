@@ -2,25 +2,37 @@ package sample;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.Arrays;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 public class Word {
-    public List<String> words;
+    public List<String> words = new ArrayList<>();
 
     public Word() {
-        String file = "a.txt";
-        StringBuilder result = new StringBuilder();
+        String file = "a.txt"; // 你的单词文件存放路径
+        BufferedReader br;//构造一个BufferedReader类来读取文件
         try {
-            BufferedReader br = new BufferedReader(new FileReader(file));//构造一个BufferedReader类来读取文件
-            String s = null;
-            while ((s = br.readLine()) != null) {//使用readLine方法，一次读一行
-                result.append(System.lineSeparator() + s);
-            }
-            br.close();
-        } catch (Exception e) {
+            br = new BufferedReader(new FileReader(file));
+            String temp;
+            while ((temp = br.readLine()) != null)
+                if (!temp.equals(""))
+                    words.add(temp);
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        this.words = Arrays.asList(result.toString().split("\n"));
+    }
+
+    // 通用的查找函数
+    public static List<String> search(String keyword, Collection<String> tCollection, BiFunction<String, String, Boolean> matcher) {
+        return (tCollection == null || matcher == null) ?
+                Collections.emptyList() :
+                tCollection.stream()
+                        .filter(t -> matcher.apply(t, keyword))
+                        .collect(Collectors.toList());
     }
 }

@@ -10,11 +10,9 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.control.ComboBox?>
 
-<BorderPane fx:id="Panel" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="357.0" prefWidth="608.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
-    <center>
-        <TextField fx:id="Input" prefHeight="78.0" prefWidth="446.0" style="-fx-font-size: 30;" BorderPane.alignment="CENTER" />
-    </center>
-    <bottom>
-        <ListView fx:id="listView" prefHeight="267.0" prefWidth="608.0" style="-fx-font-size: 30;" styleClass="-fx-pref-width: 0;" BorderPane.alignment="CENTER" />
-    </bottom>
-</BorderPane>
+<SplitPane fx:id="Panel" dividerPositions="0.5" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" orientation="VERTICAL" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1">
+  <items>
+    <TextField fx:id="input" prefHeight="0.0" prefWidth="598.0" style="-fx-font-size: 30;" />
+    <ListView fx:id="listView" prefHeight="373.0" prefWidth="598.0" style="-fx-font-size: 30;" />
+  </items>
+</SplitPane>
