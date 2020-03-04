@@ -1,13 +1,61 @@
 package sample;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Util {
+    static Set<String> set = new HashSet<String>() {
+        {
+            add(".BIN");
+            add(".bin");
+            add(".EXE");
+            add(".exe");
+            add(".DLL");
+            add(".dll");
+            add(".MSI");
+            add(".msi");
+            add(".A");
+            add(".a");
+            add(".lib");
+            add(".tar");
+            add(".zip");
+            add(".jar");
+            add(".jpg");
+            add(".png");
+            add(".gif");
+            add(".map");
+            add(".PNG");
+            add(".mp3");
+            add(".mp4");
+            add(".o");
+            add(".O");
+            add(".pyc");
+            add(".class");
+            add(".dat");
+            add(".c~");
+            add(".hprof");
+            add(".so");
+            add(".ttf");
+        }
+    };
+
+
+    public static boolean isBinary(File file) throws IOException {
+        FileInputStream fin = new FileInputStream(file);
+        long len = file.length();
+        for (int j = 0; j < (int) len; j++) {
+            int t = fin.read();
+            if (t < 32 && t != 9 && t != 10 && t != 13) {
+                fin.close();
+                return true;
+            }
+        }
+        fin.close();
+        return false;
+    }
+
     public static void getAllFileName(String path, ArrayList<String> listFileName) {
         File file = new File(path);
         File[] files = file.listFiles();
@@ -22,7 +70,7 @@ public class Util {
 
         if (files != null)
             for (File f : files)
-                if (f.isDirectory())
+                if (f.isDirectory() && f.getName().length() >= 1 && f.getName().charAt(0) != '.')
                     getAllFileName(f.getAbsolutePath() + "\\", listFileName);
     }
 
@@ -68,10 +116,26 @@ public class Util {
             return res;
         }
 
+        // https://zhidao.baidu.com/question/588878015.html
+        // 先把二进制文件统统continue了
         ArrayList<String> listFileName3 = new ArrayList<>();
         for (String name : listFileName2) {
             StringBuilder stringBuilder = new StringBuilder(); // 大文件读取会爆栈
             try {
+                //获取文件的后缀名
+                if(name.contains(".")){
+                    String suffix = name.substring(name.lastIndexOf("."));
+                    if (set.contains(suffix)) {
+                        System.out.println("忽略二进制文件" + name);
+                        continue;
+                    }
+                }
+                File file = new File(name);
+                if (isBinary(file)) {
+                    System.out.println("忽略二进制文件" + name);
+                    continue;
+                }
+
                 FileReader fileReader = new FileReader(name);
                 BufferedReader bufferedReader = new BufferedReader(fileReader);
 

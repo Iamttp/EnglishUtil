@@ -12,9 +12,14 @@ import java.util.stream.Collectors;
 
 public class Word {
     public List<String> words = new ArrayList<>();
+    public List<String> words2 = new ArrayList<>();
 
     public Word() {
-        String file = "a.txt"; // 你的单词文件存放路径
+        initWord(words, "a.txt");
+        initWord(words2, "dict.txt");
+    }
+
+    public static void initWord(List<String> words, String file) {
         BufferedReader br;//构造一个BufferedReader类来读取文件
         try {
             br = new BufferedReader(new FileReader(file));

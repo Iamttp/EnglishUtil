@@ -19,6 +19,9 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+/**
+ * 截屏类，未使用
+ */
 public class MyRect extends Application {
     Stage stage;
     static double sceneX_start;

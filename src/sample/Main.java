@@ -94,9 +94,12 @@ public class Main extends Application {
                 }).start();
             } else {
                 // 单词查找
-                List<String> searchResult = Word.search(trimed, word.words, String::contains);
+                List<String> searchResult1 = Word.search(trimed, word.words, String::contains);
+                List<String> searchResult2 = Word.search(trimed, word.words2, String::contains);
+
                 listview.getItems().clear();
-                listview.getItems().addAll(searchResult);
+                listview.getItems().addAll(searchResult1);
+                listview.getItems().addAll(searchResult2);
                 // 朗读
                 ChangeListener<Object> changeListener = new ChangeListener<Object>() {
                     @Override
