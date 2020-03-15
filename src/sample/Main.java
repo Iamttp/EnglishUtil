@@ -22,8 +22,14 @@ import java.awt.datatransfer.Transferable;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static sample.Util.readLineSearch;
 import static sample.Util.searchFileContent;
@@ -93,20 +99,53 @@ public class Main extends Application {
                     }
                 }).start();
             } else {
-                // 单词查找
-                List<String> searchResult1 = Word.search(trimed, word.words, String::contains);
-                List<String> searchResult2 = Word.search(trimed, word.words2, String::contains);
+                if (trimed.contains(" ")) {
+                    String str = null;
+                    String urlStr = "http://fanyi.youdao.com/openapi.do?keyfrom=youdao111&key=60638690&type=data&doctype=xml&version=1.1&q=" + trimed;
+                    try {
+                        URL url = new URL(urlStr);
+                        URLConnection urlConnection = url.openConnection(); // 打开连接
+                        BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), "utf-8")); // 获取输入流
+                        String line = null;
+                        StringBuilder sb = new StringBuilder();
+                        while ((line = br.readLine()) != null) {
+                            sb.append(line).append("\n");
+                        }
+                        br.close();
+                        str = sb.toString();
+                    } catch (Exception e1) {
+                        listview.getItems().clear();
+                        listview.getItems().add(e1.toString());
+                        e1.printStackTrace();
+                    }
 
-                listview.getItems().clear();
-                listview.getItems().addAll(searchResult1);
-                listview.getItems().addAll(searchResult2);
+                    Pattern pe = Pattern.compile("\\[CDATA\\[(?<q>.*?)\\]");
+//                    Pattern pe = Pattern.compile("\\<paragraph\\>\\<\\!\\[CDATA\\[(?<q>.*?)\\]");
+                    Matcher me = pe.matcher(str);
+                    listview.getItems().clear();
+                    while (me.find())
+                        listview.getItems().addAll(me.group("q"));
+                } else {
+                    // 单词查找
+                    List<String> searchResult1 = Word.search(trimed, word.words, String::contains);
+                    List<String> searchResult2 = Word.search(trimed, word.words2, String::contains);
+
+                    listview.getItems().clear();
+                    listview.getItems().addAll(searchResult1);
+                    listview.getItems().addAll(searchResult2);
+                }
                 // 朗读
                 ChangeListener<Object> changeListener = new ChangeListener<Object>() {
                     @Override
                     public void changed(ObservableValue observable, Object oldValue, Object newValue) {
                         if (newValue == null) return;
                         String str = (String) newValue;
-                        String res = str.split("\\s+")[0];
+                        String res = str;
+                        // 判断中文
+                        Pattern p = Pattern.compile("[\u4e00-\u9fa5]");
+                        Matcher m = p.matcher(str);
+                        if (m.find()) res = str.split("\\s+")[0];
+                        res = res.replaceAll("\\s+", "%20");
                         AudioClip audioClip = new AudioClip("http://dict.youdao.com/dictvoice?audio=" + res);
                         audioClip.play();
                         listview.getSelectionModel().selectedItemProperty().removeListener(this);
