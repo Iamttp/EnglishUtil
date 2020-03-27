@@ -16,9 +16,6 @@ import javafx.stage.StageStyle;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.datatransfer.Clipboard;
-import java.awt.datatransfer.StringSelection;
-import java.awt.datatransfer.Transferable;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -27,6 +24,8 @@ import java.io.File;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -81,17 +80,17 @@ public class Main extends Application {
                         listview.getItems().clear();
                         listview.getItems().add("查找完成");
                         listview.getItems().addAll(searchResult);
-                        ChangeListener<Object> changeListener = new ChangeListener<Object>() {
-                            @Override
-                            public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-                                // 获取系统剪贴板,是awt包下的
-                                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-                                Transferable trans = new StringSelection((String) newValue);
-                                clipboard.setContents(trans, null);
-                                listview.getSelectionModel().selectedItemProperty().removeListener(this);
-                            }
-                        };
-                        listview.getSelectionModel().selectedItemProperty().addListener(changeListener);
+//                        ChangeListener<Object> changeListener = new ChangeListener<Object>() {
+//                            @Override
+//                            public void changed(ObservableValue observable, Object oldValue, Object newValue) {
+//                                // 获取系统剪贴板,是awt包下的
+//                                Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+//                                Transferable trans = new StringSelection((String) newValue);
+//                                clipboard.setContents(trans, null);
+//                                listview.getSelectionModel().selectedItemProperty().removeListener(this);
+//                            }
+//                        };
+//                        listview.getSelectionModel().selectedItemProperty().addListener(changeListener);
                     } catch (Exception e1) {
                         listview.getItems().clear();
                         listview.getItems().add(e1.toString());
@@ -127,8 +126,8 @@ public class Main extends Application {
                         listview.getItems().addAll(me.group("q"));
                 } else {
                     // 单词查找
-                    List<String> searchResult1 = Word.search(trimed, word.words, String::contains);
-                    List<String> searchResult2 = Word.search(trimed, word.words2, String::contains);
+                    List<String> searchResult1 = Word.search(trimed, word.wordsA, String::contains);
+                    List<String> searchResult2 = Word.search(trimed, word.wordDict, String::contains);
 
                     listview.getItems().clear();
                     listview.getItems().addAll(searchResult1);
@@ -148,7 +147,7 @@ public class Main extends Application {
                         res = res.replaceAll("\\s+", "%20");
                         AudioClip audioClip = new AudioClip("http://dict.youdao.com/dictvoice?audio=" + res);
                         audioClip.play();
-                        listview.getSelectionModel().selectedItemProperty().removeListener(this);
+//                        listview.getSelectionModel().selectedItemProperty().removeListener(this);
                     }
                 };
                 listview.getSelectionModel().selectedItemProperty().addListener(changeListener);
@@ -187,21 +186,41 @@ public class Main extends Application {
         // 全局按键监听
         int GLOBAL_HOT_KEY_1 = 0;
         int GLOBAL_HOT_KEY_2 = 1;
+        int GLOBAL_HOT_KEY_3 = 2;
         JIntellitype.getInstance().registerHotKey(GLOBAL_HOT_KEY_1, JIntellitype.MOD_ALT, (int) 'Q');
         JIntellitype.getInstance().registerHotKey(GLOBAL_HOT_KEY_2, JIntellitype.MOD_ALT, (int) 'Z');
+        JIntellitype.getInstance().registerHotKey(GLOBAL_HOT_KEY_3, JIntellitype.MOD_ALT, (int) 'A');
         JIntellitype.getInstance().addHotKeyListener(markCode -> {
-            if (markCode == GLOBAL_HOT_KEY_1) {
-                Platform.setImplicitExit(false); //多次使用显示和隐藏设置false
-                if (primaryStage.isShowing()) {
-                    Platform.runLater(primaryStage::hide);
-                } else {
-                    Platform.runLater(primaryStage::show);
+                    Platform.runLater(() -> {
+                        if (markCode == GLOBAL_HOT_KEY_1) {
+                            Platform.setImplicitExit(false); //多次使用显示和隐藏设置false
+                            if (primaryStage.isShowing()) {
+                                Platform.runLater(primaryStage::hide);
+                            } else {
+                                Platform.runLater(primaryStage::show);
+                            }
+                        } else if (markCode == GLOBAL_HOT_KEY_2) {
+                            Platform.exit();
+                            System.exit(0); // 必杀退出法
+                        } else if (markCode == GLOBAL_HOT_KEY_3) {
+                            // 测试
+                            int score = (int) (Math.random() * word.wordsA.size());
+                            String nowWord = word.wordsA.get(score);
+                            String[] likeWordIndex = word.wordPa.get(score).split(",");
+                            System.out.println(score);
+                            System.out.println(Arrays.toString(likeWordIndex));
+                            List<String> likeWords = new ArrayList<>();
+                            for (String wordIndex : likeWordIndex) {
+                                int num = Integer.parseInt(wordIndex);
+                                likeWords.add(word.wordsA.get(num));
+                            }
+                            input.setText(nowWord);
+                            listview.getItems().clear();
+                            listview.getItems().addAll(likeWords);
+                        }
+                    });
                 }
-            } else if (markCode == GLOBAL_HOT_KEY_2) {
-                Platform.exit();
-                System.exit(0); // 必杀退出法
-            }
-        });
+        );
     }
 
     public static void main(String[] args) {

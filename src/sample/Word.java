@@ -11,12 +11,14 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 public class Word {
-    public List<String> words = new ArrayList<>();
-    public List<String> words2 = new ArrayList<>();
+    public List<String> wordsA = new ArrayList<>();
+    public List<String> wordDict = new ArrayList<>();
+    public List<String> wordPa = new ArrayList<>();
 
     public Word() {
-        initWord(words, "a.txt");
-        initWord(words2, "dict.txt");
+        initWord(wordsA, "a.txt");
+        initWord(wordDict, "dict.txt");
+        initWord(wordPa, "pa.txt");
     }
 
     public static void initWord(List<String> words, String file) {
