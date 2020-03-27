@@ -4,7 +4,6 @@ import com.melloware.jintellitype.JIntellitype;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -25,7 +24,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -35,6 +34,13 @@ import static sample.Util.searchFileContent;
 
 public class Main extends Application {
     private Word word = new Word();
+
+    ArrayList<String> tempArray = new ArrayList<>();
+    private boolean isTesting = false;
+    private String nowWord;
+    private int score = 0;
+    private boolean isTrue = false;
+    private boolean isFirst = true;
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -54,7 +60,35 @@ public class Main extends Application {
         TextField input = (TextField) root.lookup("#input");
         ListView<String> listview = (ListView<String>) root.lookup("#listView");
 
+        // 朗读
+        ChangeListener<Object> changeListener = (observable1, oldValue1, newValue1) -> {
+            Platform.runLater(() -> {
+                if (newValue1 == null) return;
+                String str = (String) newValue1;
+                String res = str;
+                if (isTesting) {
+                    isTrue = nowWord.contains((String) newValue1);
+                    tempArray.add(" ");
+                    tempArray.add(isTrue + "\tAlt+A继续");
+                    listview.getItems().clear();
+                    listview.getItems().addAll(tempArray);
+                    primaryStage.setHeight(400);
+                } else {
+                    // 判断中文
+                    Pattern p = Pattern.compile("[\u4e00-\u9fa5]");
+                    Matcher m = p.matcher(str);
+                    if (m.find()) res = str.split("\\s+")[0];
+                    res = res.replaceAll("\\s+", "%20");
+                    AudioClip audioClip = new AudioClip("http://dict.youdao.com/dictvoice?audio=" + res);
+                    audioClip.play();
+                }
+//                        listview.getSelectionModel().selectedItemProperty().removeListener(this);
+            });
+        };
+        listview.getSelectionModel().selectedItemProperty().addListener(changeListener);
+
         input.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (isTesting) return;
             String trimed = newValue.trim();
             if (trimed.length() <= 0) {
                 primaryStage.setHeight(80);
@@ -133,24 +167,6 @@ public class Main extends Application {
                     listview.getItems().addAll(searchResult1);
                     listview.getItems().addAll(searchResult2);
                 }
-                // 朗读
-                ChangeListener<Object> changeListener = new ChangeListener<Object>() {
-                    @Override
-                    public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-                        if (newValue == null) return;
-                        String str = (String) newValue;
-                        String res = str;
-                        // 判断中文
-                        Pattern p = Pattern.compile("[\u4e00-\u9fa5]");
-                        Matcher m = p.matcher(str);
-                        if (m.find()) res = str.split("\\s+")[0];
-                        res = res.replaceAll("\\s+", "%20");
-                        AudioClip audioClip = new AudioClip("http://dict.youdao.com/dictvoice?audio=" + res);
-                        audioClip.play();
-//                        listview.getSelectionModel().selectedItemProperty().removeListener(this);
-                    }
-                };
-                listview.getSelectionModel().selectedItemProperty().addListener(changeListener);
             }
             primaryStage.setHeight(400);
         });
@@ -187,9 +203,11 @@ public class Main extends Application {
         int GLOBAL_HOT_KEY_1 = 0;
         int GLOBAL_HOT_KEY_2 = 1;
         int GLOBAL_HOT_KEY_3 = 2;
+        int GLOBAL_HOT_KEY_4 = 3;
         JIntellitype.getInstance().registerHotKey(GLOBAL_HOT_KEY_1, JIntellitype.MOD_ALT, (int) 'Q');
         JIntellitype.getInstance().registerHotKey(GLOBAL_HOT_KEY_2, JIntellitype.MOD_ALT, (int) 'Z');
         JIntellitype.getInstance().registerHotKey(GLOBAL_HOT_KEY_3, JIntellitype.MOD_ALT, (int) 'A');
+        JIntellitype.getInstance().registerHotKey(GLOBAL_HOT_KEY_4, JIntellitype.MOD_ALT, (int) 'X');
         JIntellitype.getInstance().addHotKeyListener(markCode -> {
                     Platform.runLater(() -> {
                         if (markCode == GLOBAL_HOT_KEY_1) {
@@ -203,24 +221,45 @@ public class Main extends Application {
                             Platform.exit();
                             System.exit(0); // 必杀退出法
                         } else if (markCode == GLOBAL_HOT_KEY_3) {
-                            // 测试
-                            int score = (int) (Math.random() * word.wordsA.size());
-                            String nowWord = word.wordsA.get(score);
-                            String[] likeWordIndex = word.wordPa.get(score).split(",");
-                            System.out.println(score);
-                            System.out.println(Arrays.toString(likeWordIndex));
-                            List<String> likeWords = new ArrayList<>();
-                            for (String wordIndex : likeWordIndex) {
-                                int num = Integer.parseInt(wordIndex);
-                                likeWords.add(word.wordsA.get(num));
-                            }
-                            input.setText(nowWord);
-                            listview.getItems().clear();
-                            listview.getItems().addAll(likeWords);
+                            next(listview, input, primaryStage);
+                        }else if (markCode == GLOBAL_HOT_KEY_4) {
+                            isTesting = false;
                         }
                     });
                 }
         );
+    }
+
+    public void next(ListView<String> listview, TextField input, Stage primaryStage) {
+        isTesting = true;
+        // 测试
+        int index = (int) (Math.random() * word.wordsA.size());
+        nowWord = word.wordsA.get(index);
+        String[] likeWordIndex = word.wordPa.get(index).split(",");
+
+        tempArray.clear();
+        tempArray.add(nowWord);
+        for (String wordIndex : likeWordIndex) tempArray.add(word.wordsA.get(Integer.parseInt(wordIndex)));
+        Collections.shuffle(tempArray);
+
+        input.setText(nowWord.split("\\s+")[0]);
+        listview.getItems().clear();
+        List<String> likeWords2 = new ArrayList<>();
+        for (String s : tempArray) {
+            String[] temp = s.split("\\s+");
+            likeWords2.add(temp[1]);
+        }
+        likeWords2.add(" ");
+        if (isFirst){
+            likeWords2.add("开始测试" + "\t当前分数为：" + score);
+            isFirst = false;
+        }
+        else {
+            score = isTrue ? score + 10 : score - 10;
+            likeWords2.add((isTrue ? "刚刚回答正确" : "刚刚回答错误") + "\t当前分数为：" + score);
+        }
+        listview.getItems().addAll(likeWords2);
+        primaryStage.setHeight(400);
     }
 
     public static void main(String[] args) {

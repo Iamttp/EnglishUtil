@@ -32,10 +32,10 @@ public class SortWord {
             List<Float> list = new ArrayList<>();
             for (String compWord : words)
                 list.add(levenshtein(words.get(i), compWord));
-            float p1, p2, p3, p4;
-            int i1, i2, i3, i4;
-            p1 = p2 = p3 = p4 = -1;
-            i1 = i2 = i3 = i4 = -1;
+            float p1, p2, p3;
+            int i1, i2, i3;
+            p1 = p2 = p3 = -1;
+            i1 = i2 = i3 = -1;
             for (int j = 0; j < list.size(); j++) {
                 if (j == i) continue;
                 if (p1 < list.get(j)) {
@@ -57,15 +57,8 @@ public class SortWord {
                     p3 = list.get(j);
                 }
             }
-            for (int j = 0; j < list.size(); j++) {
-                if (j == i || j == i1 || j == i2 || j == i3) continue;
-                if (p4 < list.get(j)) {
-                    i4 = j;
-                    p4 = list.get(j);
-                }
-            }
 
-            bw.write(i1 + "," + i2 + "," + i3 + "," + i4 + "\n");
+            bw.write(i1 + "," + i2 + "," + i3 + "\n");
             int r = (int) (100 * i / (1.0 * words.size()));
             System.out.println(r);
         }
