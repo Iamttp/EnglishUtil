@@ -41,6 +41,7 @@ public class Main extends Application {
     private boolean isTesting = false;
     private String nowWord;
     private int score = 0;
+    private boolean process = false;
     private boolean isTrue = false;
     private boolean isFirst = true;
 
@@ -74,7 +75,8 @@ public class Main extends Application {
                 if (newValue1 == null) return;
                 String str = (String) newValue1;
                 String res = str;
-                if (isTesting) {
+                if (isTesting && !process) {
+                    process = true;
                     isTrue = nowWord.contains((String) newValue1);
                     tempArray.add(" ");
                     tempArray.add(isTrue + "\tAlt+A继续");
@@ -247,6 +249,7 @@ public class Main extends Application {
 
     public void next(ListView<String> listview, TextField input, Stage primaryStage) {
         isTesting = true;
+        process = false;
         // 测试
         int index = (int) (Math.random() * word.wordsA.size());
         nowWord = word.wordsA.get(index);
