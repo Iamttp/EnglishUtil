@@ -67,6 +67,7 @@ public class Note extends Application {
     }
 
     public void func() {
+        save();
         Platform.setImplicitExit(false); //多次使用显示和隐藏设置false
         if (primaryStage.isShowing()) {
             Platform.runLater(primaryStage::hide);

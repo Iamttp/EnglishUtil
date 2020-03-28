@@ -81,15 +81,16 @@ public class Main extends Application {
                     listview.getItems().clear();
                     listview.getItems().addAll(tempArray);
                     primaryStage.setHeight(400);
-                } else {
-                    // 判断中文
-                    Pattern p = Pattern.compile("[\u4e00-\u9fa5]");
-                    Matcher m = p.matcher(str);
-                    if (m.find()) res = str.split("\\s+")[0];
-                    res = res.replaceAll("\\s+", "%20");
-                    AudioClip audioClip = new AudioClip("http://dict.youdao.com/dictvoice?audio=" + res);
-                    audioClip.play();
                 }
+                // 判断中文
+                Pattern p = Pattern.compile("[\u4e00-\u9fa5]");
+                Matcher m = p.matcher(str);
+                if (m.find()) res = str.split("\\s+")[0];
+                Matcher m2 = p.matcher(res);
+                if (m2.find()) return;
+                res = res.replaceAll("\\s+", "%20");
+                AudioClip audioClip = new AudioClip("http://dict.youdao.com/dictvoice?audio=" + res);
+                audioClip.play();
 //                        listview.getSelectionModel().selectedItemProperty().removeListener(this);
             });
         };
