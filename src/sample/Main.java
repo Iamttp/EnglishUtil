@@ -5,11 +5,13 @@ import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.media.AudioClip;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -42,6 +44,8 @@ public class Main extends Application {
     private boolean isTrue = false;
     private boolean isFirst = true;
 
+    private Note note = new Note();
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
@@ -55,6 +59,10 @@ public class Main extends Application {
         primaryStage.setOpacity(0.8);//设置透明度 0为完全透明 1为完全不透明 默认是1
         primaryStage.initStyle(StageStyle.UNDECORATED);//设定窗口无边框
         primaryStage.show();
+
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+        primaryStage.setX((screenBounds.getWidth() - scene.getWidth()) / 2);
+        primaryStage.setY((screenBounds.getHeight() - 400) / 2);
 
         // 一定show();完再lookup
         TextField input = (TextField) root.lookup("#input");
@@ -183,6 +191,7 @@ public class Main extends Application {
             public void mouseClicked(MouseEvent e) {
                 // 鼠标右键关闭
                 if (e.getButton() == 3) {
+                    note.save();
                     Platform.exit();
                     System.exit(0); // 必杀退出法
                     return;
@@ -204,10 +213,12 @@ public class Main extends Application {
         int GLOBAL_HOT_KEY_2 = 1;
         int GLOBAL_HOT_KEY_3 = 2;
         int GLOBAL_HOT_KEY_4 = 3;
+        int GLOBAL_HOT_KEY_5 = 4;
         JIntellitype.getInstance().registerHotKey(GLOBAL_HOT_KEY_1, JIntellitype.MOD_ALT, (int) 'Q');
         JIntellitype.getInstance().registerHotKey(GLOBAL_HOT_KEY_2, JIntellitype.MOD_ALT, (int) 'Z');
         JIntellitype.getInstance().registerHotKey(GLOBAL_HOT_KEY_3, JIntellitype.MOD_ALT, (int) 'A');
         JIntellitype.getInstance().registerHotKey(GLOBAL_HOT_KEY_4, JIntellitype.MOD_ALT, (int) 'X');
+        JIntellitype.getInstance().registerHotKey(GLOBAL_HOT_KEY_5, JIntellitype.MOD_ALT, (int) 'C');
         JIntellitype.getInstance().addHotKeyListener(markCode -> {
                     Platform.runLater(() -> {
                         if (markCode == GLOBAL_HOT_KEY_1) {
@@ -218,12 +229,15 @@ public class Main extends Application {
                                 Platform.runLater(primaryStage::show);
                             }
                         } else if (markCode == GLOBAL_HOT_KEY_2) {
+                            note.save();
                             Platform.exit();
                             System.exit(0); // 必杀退出法
                         } else if (markCode == GLOBAL_HOT_KEY_3) {
                             next(listview, input, primaryStage);
-                        }else if (markCode == GLOBAL_HOT_KEY_4) {
+                        } else if (markCode == GLOBAL_HOT_KEY_4) {
                             isTesting = false;
+                        } else if (markCode == GLOBAL_HOT_KEY_5) {
+                            note.func();
                         }
                     });
                 }
@@ -250,11 +264,10 @@ public class Main extends Application {
             likeWords2.add(temp[1]);
         }
         likeWords2.add(" ");
-        if (isFirst){
+        if (isFirst) {
             likeWords2.add("开始测试" + "\t当前分数为：" + score);
             isFirst = false;
-        }
-        else {
+        } else {
             score = isTrue ? score + 10 : score - 10;
             likeWords2.add((isTrue ? "刚刚回答正确" : "刚刚回答错误") + "\t当前分数为：" + score);
         }

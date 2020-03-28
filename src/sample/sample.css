@@ -6,3 +6,15 @@
     -fx-pref-width: 0;
     -fx-pref-height: 0;
 }
+
+
+.text-area .scroll-bar:vertical{
+    -fx-pref-width: 0;
+    -fx-pref-height: 0;
+    -fx-background-color: azure;
+}
+.text-area .scroll-bar:horizontal{
+    -fx-pref-width: 0;
+    -fx-pref-height: 0;
+    -fx-background-color: azure;
+}
